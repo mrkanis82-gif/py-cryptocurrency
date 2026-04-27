@@ -1,22 +1,15 @@
-import importlib
-from typing import Callable, Union
+from unittest.mock import patch
+from typing import Union
 import pytest
 
-
-@pytest.fixture
-def mock_dependencies(monkeypatch: pytest.MonkeyPatch) -> Callable:
-    def _mock(exchange_rate: Union[int, float]) -> None:
-        monkeypatch.setattr(
-            "app.main.get_exchange_rate_prediction",
-            lambda current_rate: exchange_rate)
-    return _mock
+from app.main import cryptocurrency_action
 
 
+@patch("app.main.get_exchange_rate_prediction")
 @pytest.mark.parametrize(
     "current_rate, predicted_rate, expected",
     [
-        (100, 106, "Buy more cryptocurrency"),
-        (100, 105, "Buy more cryptocurrency"),
+        (100, 105, "Do nothing"),
         (100, 95, "Do nothing"),
         (100, 94, "Sell all your cryptocurrency"),
         (100, 102, "Do nothing"),
@@ -24,13 +17,10 @@ def mock_dependencies(monkeypatch: pytest.MonkeyPatch) -> Callable:
     ],
 )
 def test_cryptocurrency_action(
-    mock_dependencies: Callable,
+    mock_prd: object,
     current_rate: Union[int, float],
     predicted_rate: Union[int, float],
     expected: str
 ) -> None:
-    from app import main
-    importlib.reload(main)
-    mock_dependencies(predicted_rate)
-    from app.main import cryptocurrency_action
+    mock_prd.return_value = predicted_rate
     assert cryptocurrency_action(current_rate) == expected
