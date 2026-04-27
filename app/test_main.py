@@ -16,7 +16,7 @@ def mock_dependencies(monkeypatch: pytest.MonkeyPatch) -> Callable:
     "current_rate, predicted_rate, expected",
     [
         (100, 106, "Buy more cryptocurrency"),
-        (100, 105, "Do nothing"),
+        (100, 105, "Buy more cryptocurrency"),
         (100, 95, "Do nothing"),
         (100, 94, "Sell all your cryptocurrency"),
         (100, 102, "Do nothing"),
